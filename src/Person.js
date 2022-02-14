@@ -1,30 +1,14 @@
-function Person(person) {
-  if (person.person === null) {
+function Person({ person, onClick }) {
+  if (person == null) {
     return null;
   }
 
-  let { first_name, last_name, email } = person.person;
-
-  if (!email) {
-    email = '--';
-  }
-
-  if (!first_name) {
-    first_name = '--';
-  }
-
-  if (!last_name) {
-    last_name = '--';
-  }
-
   return (
-    <>
-      <ul>
-        <li>First Name: {first_name}</li>
-        <li>Last Name: {last_name}</li>
-        <li>Email: {email}</li>
-      </ul>
-    </>
+    <ul data-testid={'details'} onClick={onClick}>
+      <li>First name: {person.first_name}</li>
+      <li>Last name: {person.last_name}</li>
+      <li>Email: {person.email}</li>
+    </ul>
   );
 }
 

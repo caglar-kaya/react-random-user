@@ -1,62 +1,51 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import Person from './Person';
 
-describe('Person component', () => {
-  test('person is null', () => {
-    const { container } = render(<Person person={null} />);
-    expect(container).toBeEmptyDOMElement();
+describe('Person', () => {
+  it('renders nothing if the person prop is null', () => {
+    render(<Person person={null} />);
+
+    expect(screen.queryByText('First')).not.toBeInTheDocument();
   });
-  // test(`person isn't given`, () => {
-  //   const { container } = render(<Person />);
-  //   expect(container).toBeEmptyDOMElement();
-  // });
-  test('person is not empty', () => {
-    render(
-      <Person
-        person={{
-          first_name: 'Caglar',
-          last_name: 'Kaya',
-          email: 'abc@gmail.com',
-        }}
-      />,
-    );
-    const linkElement = screen.getByText(/First/i);
-    expect(linkElement).toBeInTheDocument();
+
+  it('renders nothing if the person prop is undefined', () => {
+    render(<Person />);
+
+    expect(screen.queryByText('First')).not.toBeInTheDocument();
   });
-  test('person is not empty and no email', () => {
-    render(
-      <Person
-        person={{
-          first_name: 'Caglar',
-          last_name: 'Kaya',
-        }}
-      />,
-    );
-    const linkElement = screen.getByText(/Email: --/i);
-    expect(linkElement).toBeInTheDocument();
+
+  it('renders the person fields if the person prop is filled in', () => {
+    const testPerson = {
+      first_name: 'John',
+      last_name: 'Doe',
+      email: 'test@mail.com',
+    };
+    render(<Person person={testPerson} />);
+
+    expect(
+      screen.getByText(`First name: ${testPerson.first_name}`),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(`Last name: ${testPerson.last_name}`),
+    ).toBeInTheDocument();
+    expect(screen.getByText(`Email: ${testPerson.email}`)).toBeInTheDocument();
   });
-  test('person is not empty and no first name', () => {
-    render(
-      <Person
-        person={{
-          last_name: 'Kaya',
-          email: 'abc@gmail.com',
-        }}
-      />,
-    );
-    const linkElement = screen.getByText(/First Name: --/i);
-    expect(linkElement).toBeInTheDocument();
-  });
-  test('person is not empty and no last name', () => {
-    render(
-      <Person
-        person={{
-          first_name: 'Caglar',
-          email: 'abc@gmail.com',
-        }}
-      />,
-    );
-    const linkElement = screen.getByText(/Last Name: --/i);
-    expect(linkElement).toBeInTheDocument();
+
+  it('Calls the onClick prop if the user clicks on the details', () => {
+    const testFunction = jest.fn(() => {});
+    const testPerson = {
+      first_name: 'John',
+      last_name: 'Doe',
+      email: 'test@mail.com',
+    };
+    render(<Person person={testPerson} onClick={testFunction} />);
+
+    const list = screen.getByTestId('details');
+
+    expect(testFunction).not.toHaveBeenCalled();
+
+    fireEvent.click(list);
+
+    expect(testFunction).toHaveBeenCalled();
   });
 });

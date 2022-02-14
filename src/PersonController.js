@@ -4,30 +4,41 @@ import Person from './Person';
 function PersonController() {
   const [person, setPerson] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  async function getPerson() {
-    try {
-      const response = await fetch('https://www.randomuser.me/api?results=1');
-      const person = await response.json();
-      const personFiltered = {
-        first_name: person.results[0].name.first,
-        last_name: person.results[0].name.last,
-        email: person.results[0].email,
-      };
-      setPerson(personFiltered);
-      setIsLoading(false);
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  const [hasError, setError] = useState(false);
 
   useEffect(() => {
+    const getPerson = async () => {
+      try {
+        const response = await fetch('https://www.randomuser.me/api?results=1');
+        const data = await response.json();
+        const personFromAPI = data.results[0];
+
+        setPerson({
+          first_name: personFromAPI.name.first,
+          last_name: personFromAPI.name.last,
+          email: personFromAPI.email,
+        });
+        setIsLoading(false);
+      } catch (error) {
+        console.error(error);
+        setError(true);
+      }
+    };
+
     getPerson();
   }, []);
 
-  return (
-    <div>{isLoading ? <div>Loading...</div> : <Person person={person} />}</div>
-  );
+  if (hasError) {
+    return 'Oops, something went wrong. Come back later!';
+  }
+
+  if (isLoading) {
+    return (
+      <img src="loading.gif" data-testid={'loading-image'} alt="Loading" />
+    );
+  }
+
+  return <Person person={person} />;
 }
 
 export default PersonController;
